@@ -1,0 +1,554 @@
+{
+ "replaceBuiltin": true,
+ "templates": [
+  {
+   "id": "frame-11",
+   "name": "Memory Ticket",
+   "slots": 2,
+   "src": "frame-11.webp",
+   "thumb": "frame-11-thumb.webp",
+   "width": 800,
+   "height": 2400,
+   "photoSlots": [
+    {
+     "x": 78,
+     "y": 261,
+     "w": 644,
+     "h": 778
+    },
+    {
+     "x": 78,
+     "y": 1053,
+     "w": 644,
+     "h": 778
+    }
+   ]
+  },
+  {
+   "id": "frame-12",
+   "name": "Relax Teal",
+   "slots": 3,
+   "src": "frame-12.webp",
+   "thumb": "frame-12-thumb.webp",
+   "width": 800,
+   "height": 2400,
+   "photoSlots": [
+    {
+     "x": 100,
+     "y": 181,
+     "w": 600,
+     "h": 605
+    },
+    {
+     "x": 100,
+     "y": 898,
+     "w": 600,
+     "h": 605
+    },
+    {
+     "x": 100,
+     "y": 1614,
+     "w": 600,
+     "h": 605
+    }
+   ]
+  },
+  {
+   "id": "frame-9",
+   "name": "Golden Hearts",
+   "slots": 3,
+   "src": "frame-9.webp",
+   "thumb": "frame-9-thumb.webp",
+   "width": 800,
+   "height": 2400,
+   "photoSlots": [
+    {
+     "x": 118,
+     "y": 224,
+     "w": 564,
+     "h": 535
+    },
+    {
+     "x": 118,
+     "y": 919,
+     "w": 564,
+     "h": 536
+    },
+    {
+     "x": 119,
+     "y": 1614,
+     "w": 563,
+     "h": 535
+    }
+   ]
+  },
+  {
+   "id": "frame-13",
+   "name": "Memory Report",
+   "slots": 3,
+   "src": "frame-13.webp",
+   "thumb": "frame-13-thumb.webp",
+   "width": 800,
+   "height": 2400,
+   "photoSlots": [
+    {
+     "x": 54,
+     "y": 658,
+     "w": 693,
+     "h": 499
+    },
+    {
+     "x": 54,
+     "y": 1178,
+     "w": 693,
+     "h": 498
+    },
+    {
+     "x": 54,
+     "y": 1698,
+     "w": 692,
+     "h": 498
+    }
+   ]
+  },
+  {
+   "id": "frame-15",
+   "name": "Denim Bow",
+   "slots": 3,
+   "src": "frame-15.webp",
+   "thumb": "frame-15-thumb.webp",
+   "width": 800,
+   "height": 2400,
+   "photoSlots": [
+    {
+     "x": 78,
+     "y": 78,
+     "w": 645,
+     "h": 560
+    },
+    {
+     "x": 78,
+     "y": 887,
+     "w": 644,
+     "h": 626
+    },
+    {
+     "x": 78,
+     "y": 1762,
+     "w": 645,
+     "h": 560
+    }
+   ]
+  },
+  {
+   "id": "frame-10",
+   "name": "Archive Pink",
+   "slots": 3,
+   "src": "frame-10.webp",
+   "thumb": "frame-10-thumb.webp",
+   "width": 800,
+   "height": 2400,
+   "photoSlots": [
+    {
+     "x": 38,
+     "y": 54,
+     "w": 699,
+     "h": 708
+    },
+    {
+     "x": 77,
+     "y": 881,
+     "w": 638,
+     "h": 638
+    },
+    {
+     "x": 141,
+     "y": 1784,
+     "w": 518,
+     "h": 487
+    }
+   ]
+  },
+  {
+   "id": "frame-2",
+   "name": "Breaking News",
+   "slots": 3,
+   "src": "frame-2.webp",
+   "thumb": "frame-2-thumb.webp",
+   "width": 1600,
+   "height": 2400,
+   "photoSlots": [
+    {
+     "x": 93,
+     "y": 652,
+     "w": 701,
+     "h": 451
+    },
+    {
+     "x": 806,
+     "y": 652,
+     "w": 701,
+     "h": 451
+    },
+    {
+     "x": 93,
+     "y": 1110,
+     "w": 1413,
+     "h": 821
+    }
+   ]
+  },
+  {
+   "id": "frame-14",
+   "name": "Friendship Ovals",
+   "slots": 4,
+   "src": "frame-14.webp",
+   "thumb": "frame-14-thumb.webp",
+   "width": 800,
+   "height": 2400,
+   "photoSlots": [
+    {
+     "x": 86,
+     "y": 350,
+     "w": 629,
+     "h": 409
+    },
+    {
+     "x": 86,
+     "y": 791,
+     "w": 629,
+     "h": 409
+    },
+    {
+     "x": 86,
+     "y": 1232,
+     "w": 629,
+     "h": 409
+    },
+    {
+     "x": 86,
+     "y": 1673,
+     "w": 629,
+     "h": 409
+    }
+   ]
+  },
+  {
+   "id": "frame-8",
+   "name": "Cute Yellow",
+   "slots": 4,
+   "src": "frame-8.webp",
+   "thumb": "frame-8-thumb.webp",
+   "width": 800,
+   "height": 2400,
+   "photoSlots": [
+    {
+     "x": 125,
+     "y": 78,
+     "w": 551,
+     "h": 520
+    },
+    {
+     "x": 125,
+     "y": 649,
+     "w": 551,
+     "h": 521
+    },
+    {
+     "x": 125,
+     "y": 1219,
+     "w": 550,
+     "h": 521
+    },
+    {
+     "x": 125,
+     "y": 1789,
+     "w": 550,
+     "h": 521
+    }
+   ]
+  },
+  {
+   "id": "frame-6",
+   "name": "Groovy Happiness",
+   "slots": 6,
+   "src": "frame-6.webp",
+   "thumb": "frame-6-thumb.webp",
+   "width": 1600,
+   "height": 2400,
+   "photoSlots": [
+    {
+     "x": 105,
+     "y": 183,
+     "w": 648,
+     "h": 565
+    },
+    {
+     "x": 847,
+     "y": 183,
+     "w": 648,
+     "h": 565
+    },
+    {
+     "x": 105,
+     "y": 829,
+     "w": 648,
+     "h": 565
+    },
+    {
+     "x": 847,
+     "y": 829,
+     "w": 647,
+     "h": 565
+    },
+    {
+     "x": 105,
+     "y": 1473,
+     "w": 648,
+     "h": 566
+    },
+    {
+     "x": 847,
+     "y": 1473,
+     "w": 648,
+     "h": 566
+    }
+   ]
+  },
+  {
+   "id": "frame-1",
+   "name": "Boarding Pass",
+   "slots": 6,
+   "src": "frame-1.webp",
+   "thumb": "frame-1-thumb.webp",
+   "width": 1600,
+   "height": 2400,
+   "photoSlots": [
+    {
+     "x": 72,
+     "y": 424,
+     "w": 656,
+     "h": 537
+    },
+    {
+     "x": 868,
+     "y": 424,
+     "w": 656,
+     "h": 537
+    },
+    {
+     "x": 72,
+     "y": 1038,
+     "w": 656,
+     "h": 536
+    },
+    {
+     "x": 868,
+     "y": 1038,
+     "w": 657,
+     "h": 536
+    },
+    {
+     "x": 72,
+     "y": 1652,
+     "w": 656,
+     "h": 536
+    },
+    {
+     "x": 868,
+     "y": 1652,
+     "w": 657,
+     "h": 536
+    }
+   ]
+  },
+  {
+   "id": "frame-3",
+   "name": "Lovely Day",
+   "slots": 6,
+   "src": "frame-3.webp",
+   "thumb": "frame-3-thumb.webp",
+   "width": 1600,
+   "height": 2400,
+   "photoSlots": [
+    {
+     "x": 97,
+     "y": 306,
+     "w": 595,
+     "h": 493
+    },
+    {
+     "x": 862,
+     "y": 280,
+     "w": 676,
+     "h": 462
+    },
+    {
+     "x": 60,
+     "y": 938,
+     "w": 675,
+     "h": 462
+    },
+    {
+     "x": 889,
+     "y": 920,
+     "w": 615,
+     "h": 510
+    },
+    {
+     "x": 97,
+     "y": 1553,
+     "w": 595,
+     "h": 493
+    },
+    {
+     "x": 862,
+     "y": 1623,
+     "w": 676,
+     "h": 463
+    }
+   ]
+  },
+  {
+   "id": "frame-4",
+   "name": "Happy Moment",
+   "slots": 6,
+   "src": "frame-4.webp",
+   "thumb": "frame-4-thumb.webp",
+   "width": 1600,
+   "height": 2400,
+   "photoSlots": [
+    {
+     "x": 81,
+     "y": 338,
+     "w": 600,
+     "h": 600
+    },
+    {
+     "x": 907,
+     "y": 409,
+     "w": 603,
+     "h": 505
+    },
+    {
+     "x": 86,
+     "y": 983,
+     "w": 548,
+     "h": 592
+    },
+    {
+     "x": 907,
+     "y": 982,
+     "w": 604,
+     "h": 506
+    },
+    {
+     "x": 83,
+     "y": 1622,
+     "w": 592,
+     "h": 592
+    },
+    {
+     "x": 907,
+     "y": 1556,
+     "w": 603,
+     "h": 505
+    }
+   ]
+  },
+  {
+   "id": "frame-5",
+   "name": "Groovy Days",
+   "slots": 6,
+   "src": "frame-5.webp",
+   "thumb": "frame-5-thumb.webp",
+   "width": 1600,
+   "height": 2400,
+   "photoSlots": [
+    {
+     "x": 70,
+     "y": 307,
+     "w": 650,
+     "h": 565
+    },
+    {
+     "x": 877,
+     "y": 307,
+     "w": 650,
+     "h": 565
+    },
+    {
+     "x": 70,
+     "y": 918,
+     "w": 650,
+     "h": 565
+    },
+    {
+     "x": 877,
+     "y": 918,
+     "w": 650,
+     "h": 565
+    },
+    {
+     "x": 70,
+     "y": 1528,
+     "w": 650,
+     "h": 565
+    },
+    {
+     "x": 877,
+     "y": 1528,
+     "w": 650,
+     "h": 565
+    }
+   ]
+  },
+  {
+   "id": "frame-7",
+   "name": "OMG Duo",
+   "slots": 6,
+   "src": "frame-7.webp",
+   "thumb": "frame-7-thumb.webp",
+   "width": 1600,
+   "height": 2400,
+   "photoSlots": [
+    {
+     "x": 127,
+     "y": 230,
+     "w": 505,
+     "h": 536
+    },
+    {
+     "x": 890,
+     "y": 209,
+     "w": 636,
+     "h": 591
+    },
+    {
+     "x": 127,
+     "y": 910,
+     "w": 505,
+     "h": 536
+    },
+    {
+     "x": 890,
+     "y": 902,
+     "w": 636,
+     "h": 590
+    },
+    {
+     "x": 127,
+     "y": 1594,
+     "w": 505,
+     "h": 536
+    },
+    {
+     "x": 890,
+     "y": 1595,
+     "w": 636,
+     "h": 581
+    }
+   ]
+  }
+ ]
+}

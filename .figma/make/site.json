@@ -1,0 +1,18 @@
+{
+  "description": "Capture and share fun photos instantly with a trendy, interactive online photobooth. Perfect for events and social media with Gen Z-inspired design and easy-to-use features.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  },
+  "title": "KlikKo — Photobooth Online",
+  "language": "id",
+  "icons": {
+    "icon": "favicon.png"
+  },
+  "customScripts": {
+    "headEnd": "<link rel=\"apple-touch-icon\" href=\"favicon.png\" />"
+  }
+}
