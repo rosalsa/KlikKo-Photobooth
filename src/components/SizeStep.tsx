@@ -54,7 +54,7 @@ export function SizeStep({
         <div className="kpop-banner-copy">
           <span className="size-mood">SPECIAL EDITION</span>
           <h3>K-POP FRAME</h3>
-          <p>Foto bareng idol favoritmu! Pose idol muncul di kamera, tinggal ikuti gayanya.</p>
+          <p>Foto bareng idol favoritmu!</p>
           <span className="size-go">
             Pilih idol <Icon name="arrow" size={16} />
           </span>

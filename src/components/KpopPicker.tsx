@@ -19,11 +19,7 @@ export function KpopPicker({
         <button className="mini-btn" onClick={onBack}>
           <Icon name="back" size={15} /> Pilih ukuran lain
         </button>
-        <div>
-          <span className="size-mood">K-POP FRAME</span>
-          <h3>FOTO BARENG SIAPA?</h3>
-          <p>Pilih frame favoritmu. Di langkah berikutnya, pose idol akan muncul di kamera sebagai panduan.</p>
-        </div>
+        <h3>MAU FOTO BARENG SIAPA?</h3>
       </div>
       <div className="kpop-grid">
         {templates.map((t) => (

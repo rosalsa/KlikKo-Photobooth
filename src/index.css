@@ -396,8 +396,8 @@ footer p { justify-self: end; text-align: right; font-size: 10px; font-weight: 7
 .kpop-banner:hover .kb3 { transform: rotate(13deg) translateY(-4px); }
 
 .kpop-picker { max-width: 1220px; margin: 0 auto; }
-.kpop-head { display: flex; gap: 24px; align-items: flex-start; margin-bottom: 26px; flex-wrap: wrap; }
-.kpop-head h3 { font: clamp(28px, 3.4vw, 44px) 'Archivo Black'; letter-spacing: -.04em; margin: 12px 0 6px; line-height: 1; }
+.kpop-head { display: flex; gap: 24px; align-items: center; margin-bottom: 26px; flex-wrap: wrap; }
+.kpop-head h3 { font: clamp(28px, 3.4vw, 44px) 'Archivo Black'; letter-spacing: -.04em; margin: 0; line-height: 1; }
 .kpop-head p { margin: 0; font-size: 14px; font-weight: 600; max-width: 520px; line-height: 1.5; color: #4b454d; }
 .kpop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 20px; }
 .kpop-card { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding: 12px; border: var(--line); border-radius: 18px; background: var(--white); cursor: pointer; text-align: left; box-shadow: 5px 5px 0 var(--ink); transition: transform .18s, box-shadow .18s; }
