@@ -39,3 +39,16 @@ python3 scripts/build-frames.py frame public/templates
 
 Skrip mendeteksi lubang transparan, memperkecil gambar, dan menulis `manifest.json` otomatis.
 Atur nama tampil dan urutan di `NAMES` / `ORDER` pada `scripts/build-frames.py`.
+
+## Frame K-Pop (folder `kpop/`)
+
+Frame K-Pop beda dengan frame biasa: sosok idol adalah bagian **tidak transparan** di dalam jendela foto.
+Foto user ditaruh di belakang frame, dan potongan idol ditampilkan di kamera sebagai panduan pose.
+Frame dikelompokkan otomatis (3 atau 4 foto) dan dibaca dari `public/templates/kpop/manifest.json`.
+
+```
+python3 scripts/build-kpop.py "<folder frame kpop>" public/templates/kpop
+```
+
+Untuk memberi nama idol/grup pada tiap frame, isi `NAMES` di `scripts/build-kpop.py`, contoh:
+`NAMES = {"1": "Nama Idol A", "2": "Nama Idol B"}` (kunci = nomor file), lalu jalankan skrip lagi.

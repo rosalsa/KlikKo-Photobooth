@@ -23,9 +23,11 @@ type Props = {
   maxWidth?: number
   className?: string
   label?: string
+  /** tampilkan nomor pada slot kosong */
+  numbers?: boolean
 }
 
-export function StripCanvas({ template, photos, maxWidth = 900, className, label }: Props) {
+export function StripCanvas({ template, photos, maxWidth = 900, className, label, numbers = true }: Props) {
   const ref = useRef<HTMLCanvasElement>(null)
   const fontsTick = useFontsTick()
 
@@ -38,12 +40,12 @@ export function StripCanvas({ template, photos, maxWidth = 900, className, label
         overlaySrc ? loadImage(overlaySrc).catch(() => null) : null,
       ])
       if (cancelled || !ref.current) return
-      composeTemplate(ref.current, template, imgs, { scale: Math.min(1, maxWidth / template.width), overlay })
+      composeTemplate(ref.current, template, imgs, { scale: Math.min(1, maxWidth / template.width), overlay, numbers })
     })()
     return () => {
       cancelled = true
     }
-  }, [template, photos, maxWidth, fontsTick])
+  }, [template, photos, maxWidth, numbers, fontsTick])
 
   return (
     <canvas

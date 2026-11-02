@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CameraStep } from './components/CameraStep'
 import { EditStep } from './components/EditStep'
 import { Icon } from './components/Icon'
+import { KpopPicker } from './components/KpopPicker'
 import { SizeStep } from './components/SizeStep'
 import { builtinTemplates, loadManifestTemplates, type Template } from './lib/templates'
 import type { Sticker } from './lib/stickers'
@@ -28,6 +29,7 @@ function App() {
   // Kamera dipegang di level App supaya izin cukup sekali dan stream tetap hidup antar langkah.
   const [stream, setStream] = useState<MediaStream | null>(null)
   const [cameraError, setCameraError] = useState('')
+  const [cameraFallback, setCameraFallback] = useState(false)
   const [mirror, setMirror] = useState(true)
   const [timer, setTimer] = useState(3)
   const [auto, setAuto] = useState(true)
@@ -36,6 +38,10 @@ function App() {
 
   const builtins = useMemo(() => builtinTemplates(), [])
   const [fileTemplates, setFileTemplates] = useState<Template[]>([])
+  const [kpopTemplates, setKpopTemplates] = useState<Template[]>([])
+  // mode K-Pop: frame idol terpilih (jumlah foto & template ikut frame ini)
+  const [kpop, setKpop] = useState<Template | null>(null)
+  const [view, setView] = useState<'sizes' | 'kpop'>('sizes')
   const [replaceBuiltin, setReplaceBuiltin] = useState(false)
   const [chosen, setChosen] = useState<Record<number, string>>({})
 
@@ -50,12 +56,13 @@ function App() {
     // Di http://192.168.x.x (mis. dev server dibuka dari HP) navigator.mediaDevices tidak ada, dan popup izin tidak pernah muncul.
     if (!navigator.mediaDevices?.getUserMedia) {
       const inApp = /FBAN|FBAV|Instagram|Line\/|MicroMessenger|TikTok|GSA\//i.test(navigator.userAgent)
+      setCameraFallback(true)
       setCameraError(
         !window.isSecureContext
-          ? 'Kamera hanya bisa dipakai lewat alamat https://. Buka versi online (https) dari website ini, atau pakai tombol kamera HP di bawah.'
+          ? 'Kamera hanya bisa dipakai lewat alamat https://. Buka versi online (https) dari website ini.'
           : inApp
-            ? 'Browser di dalam aplikasi ini memblokir kamera. Buka lewat Chrome atau Safari, atau pakai tombol kamera HP di bawah.'
-            : 'Browser ini tidak mendukung akses kamera. Pakai tombol kamera HP di bawah.',
+            ? 'Browser di dalam aplikasi ini memblokir kamera. Buka lewat Chrome atau Safari.'
+            : 'Browser ini tidak mendukung akses kamera.',
       )
       return
     }
@@ -89,17 +96,21 @@ function App() {
     const name = (lastErr as DOMException)?.name ?? 'Error'
     const inFrame = window.self !== window.top
     let msg: string
+    let fallback = true
     if (name === 'NotAllowedError' || name === 'SecurityError') {
+      fallback = false
       msg = inFrame
         ? 'Kamera diblokir karena halaman ini dibuka di dalam frame. Buka website ini di tab baru, lalu coba lagi.'
-        : 'Izin kamera ditolak atau diblokir. Ketuk ikon gembok di address bar, izinkan Kamera untuk situs ini, lalu klik Aktifkan Kamera lagi.'
+        : 'Izin kamera ditolak atau diblokir. Ketuk ikon gembok di address bar, izinkan Kamera untuk situs ini, lalu klik Coba Lagi.'
     } else if (name === 'NotFoundError' || name === 'OverconstrainedError') {
-      msg = 'Kamera tidak ditemukan di perangkat ini. Kamu bisa pakai tombol kamera HP di bawah.'
+      msg = 'Kamera tidak ditemukan di perangkat ini.'
     } else if (name === 'NotReadableError' || name === 'AbortError') {
+      fallback = false
       msg = 'Kamera sedang dipakai aplikasi lain. Tutup aplikasi itu lalu coba lagi.'
     } else {
-      msg = 'Kamera belum bisa dibuka. Coba lagi, atau pakai tombol kamera HP di bawah.'
+      msg = 'Kamera belum bisa dibuka. Coba lagi.'
     }
+    setCameraFallback(fallback)
     setCameraError(`${msg} (kode: ${name})`)
   }, [])
 
@@ -111,8 +122,9 @@ function App() {
   )
 
   useEffect(() => {
-    loadManifestTemplates().then(({ templates, replaceBuiltin: rb }) => {
+    loadManifestTemplates().then(({ templates, kpop: kp, replaceBuiltin: rb }) => {
       setFileTemplates(templates)
+      setKpopTemplates(kp)
       setReplaceBuiltin(rb)
     })
   }, [])
@@ -128,18 +140,34 @@ function App() {
   )
 
   const list = n ? templatesFor(n) : []
-  const template = n ? (list.find((t) => t.id === chosen[n]) ?? list[0]) : undefined
+  const template = kpop ?? (n ? (list.find((t) => t.id === chosen[n]) ?? list[0]) : undefined)
 
   const goBooth = () => {
     document.getElementById('booth')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   const pickSize = (count: number) => {
-    if (count !== n) {
+    if (kpop) {
+      // pindah dari mode K-Pop: foto lama dibuat untuk pose idol, jadi mulai dari awal
+      setKpop(null)
+      setShots(Array(count).fill(null))
+      setStickers([])
+      setN(count)
+    } else if (count !== n) {
       setShots((cur) => Array.from({ length: count }, (_, i) => cur[i] ?? null))
       setStickers([])
       setN(count)
     }
+    setStep('shoot')
+  }
+
+  const pickKpop = (t: Template) => {
+    if (kpop?.id !== t.id) {
+      setShots(Array(t.slots).fill(null))
+      setStickers([])
+    }
+    setKpop(t)
+    setN(t.slots)
     setStep('shoot')
   }
 
@@ -150,7 +178,10 @@ function App() {
   }
 
   const goToStep = (target: Step) => {
-    if (target === 'size') setStep('size')
+    if (target === 'size') {
+      setView('sizes')
+      setStep('size')
+    }
     else if (target === 'shoot' && n) setStep('shoot')
     else if (target === 'edit' && n && shots.length === n && shots.every(Boolean)) setStep('edit')
   }
@@ -219,13 +250,26 @@ function App() {
                 aria-current={step === s.id ? 'step' : undefined}
               >
                 <b>{s.num}</b> {s.label}
-                {s.id === 'size' && n ? <em>{n} foto</em> : null}
+                {s.id === 'size' && n ? <em>{kpop ? 'K-Pop' : `${n} foto`}</em> : null}
               </button>
             </li>
           ))}
         </ol>
 
-        {step === 'size' && <SizeStep templatesFor={templatesFor} current={n} onPick={pickSize} />}
+        {step === 'size' && view === 'sizes' && (
+          <SizeStep
+            templatesFor={templatesFor}
+            current={kpop ? null : n}
+            onPick={pickSize}
+            kpopTemplates={kpopTemplates}
+            kpopActive={!!kpop}
+            onKpop={() => setView('kpop')}
+          />
+        )}
+
+        {step === 'size' && view === 'kpop' && (
+          <KpopPicker templates={kpopTemplates} currentId={kpop?.id ?? null} onPick={pickKpop} onBack={() => setView('sizes')} />
+        )}
 
         {step === 'shoot' && n && template && (
           <CameraStep
@@ -237,6 +281,8 @@ function App() {
             previewTemplate={template}
             stream={stream}
             cameraError={cameraError}
+            cameraFallback={cameraFallback}
+            kpop={kpop}
             onStartCamera={startCamera}
             mirror={mirror}
             setMirror={setMirror}
@@ -253,7 +299,8 @@ function App() {
           <EditStep
             n={n}
             shots={shots}
-            templates={list}
+            templates={kpop ? [kpop] : list}
+            lockedTemplate={!!kpop}
             template={template}
             onTemplate={(id) => setChosen((c) => ({ ...c, [n]: id }))}
             stickers={stickers}

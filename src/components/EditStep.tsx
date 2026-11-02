@@ -14,6 +14,8 @@ type Props = {
   shots: (string | null)[]
   templates: Template[]
   template: Template
+  /** frame K-Pop dikunci: pose foto mengikuti frame ini */
+  lockedTemplate?: boolean
   onTemplate: (id: string) => void
   stickers: Sticker[]
   setStickers: React.Dispatch<React.SetStateAction<Sticker[]>>
@@ -104,7 +106,7 @@ function StickerView({
 }
 
 export function EditStep({
-  n, shots, templates, template, onTemplate, stickers, setStickers, onBack,
+  n, shots, templates, template, lockedTemplate, onTemplate, stickers, setStickers, onBack,
 }: Props) {
   const stageRef = useRef<HTMLDivElement>(null)
   const stickerFileRef = useRef<HTMLInputElement>(null)
@@ -203,7 +205,7 @@ export function EditStep({
 
       <div className="edit-side">
         <div className="tool-panel">
-          <div className="panel-title"><span>PILIH TEMPLATE • {n} FOTO</span><b>✦</b></div>
+          <div className="panel-title"><span>{lockedTemplate ? 'FRAME K-POP' : `PILIH TEMPLATE • ${n} FOTO`}</span><b>✦</b></div>
           <div className="tpl-grid">
             {templates.map((t) => (
               <button
@@ -218,6 +220,7 @@ export function EditStep({
               </button>
             ))}
           </div>
+          {lockedTemplate && <p className="tool-hint">Frame dikunci supaya pose kamu pas dengan idol di frame ini.</p>}
         </div>
 
         <div className="tool-panel">

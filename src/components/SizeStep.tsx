@@ -13,12 +13,19 @@ export function SizeStep({
   templatesFor,
   current,
   onPick,
+  kpopTemplates,
+  kpopActive,
+  onKpop,
 }: {
   templatesFor: (n: number) => Template[]
   current: number | null
   onPick: (n: number) => void
+  kpopTemplates: Template[]
+  kpopActive: boolean
+  onKpop: () => void
 }) {
   return (
+    <>
     <div className="size-grid">
       {SLOT_OPTIONS.map((n, i) => {
         const tpl = templatesFor(n)[0]
@@ -42,5 +49,25 @@ export function SizeStep({
         )
       })}
     </div>
+    {kpopTemplates.length > 0 && (
+      <button className={`kpop-banner ${kpopActive ? 'active' : ''}`} onClick={onKpop} aria-label="Pilih K-Pop frame">
+        <div className="kpop-banner-copy">
+          <span className="size-mood">SPECIAL EDITION</span>
+          <h3>K-POP FRAME</h3>
+          <p>Foto bareng idol favoritmu! Pose idol muncul di kamera, tinggal ikuti gayanya.</p>
+          <span className="size-go">
+            Pilih idol <Icon name="arrow" size={16} />
+          </span>
+        </div>
+        <div className="kpop-banner-stack" aria-hidden="true">
+          {kpopTemplates.slice(0, 4).map((t, i) => (
+            <div key={t.id} className={`kb kb${i}`}>
+              <StripCanvas template={t} photos={Array(t.slots).fill(null)} maxWidth={240} numbers={false} />
+            </div>
+          ))}
+        </div>
+      </button>
+    )}
+    </>
   )
 }

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { filters, frameToDataURL } from '../lib/filters'
+import { poseGuide } from '../lib/guide'
 import { loadImage, readFileAsDataURL } from '../lib/images'
 import type { Template } from '../lib/templates'
 import { Icon } from './Icon'
@@ -17,6 +18,9 @@ type Props = {
   previewTemplate: Template
   stream: MediaStream | null
   cameraError: string
+  cameraFallback: boolean
+  /** frame K-Pop terpilih: kamera mengikuti bentuk slot, ada panduan pose, dan upload dimatikan */
+  kpop: Template | null
   onStartCamera: () => void
   mirror: boolean
   setMirror: (v: boolean) => void
@@ -29,7 +33,7 @@ type Props = {
 }
 
 export function CameraStep({
-  n, shots, setShots, filterIndex, setFilterIndex, previewTemplate, stream, cameraError, onStartCamera,
+  n, shots, setShots, filterIndex, setFilterIndex, previewTemplate, stream, cameraError, cameraFallback, kpop, onStartCamera,
   mirror, setMirror, timer, setTimer, auto, setAuto, onNext, onReset,
 }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -43,6 +47,7 @@ export function CameraStep({
   const [current, setCurrent] = useState(0)
   const [flash, setFlash] = useState(false)
   const [retake, setRetake] = useState<number | null>(null)
+  const [guide, setGuide] = useState<string | null>(null)
 
   filterRef.current = filterIndex
   mirrorRef.current = mirror
@@ -50,6 +55,19 @@ export function CameraStep({
   const filled = shots.filter(Boolean).length
   const full = filled >= n
   const targetIndex = retake ?? shots.findIndex((s) => !s)
+  // slot yang sedang difoto (menentukan panduan pose & bentuk crop pada mode K-Pop)
+  const activeSlot = running ? current - 1 : targetIndex >= 0 ? targetIndex : 0
+  const slotRect = kpop ? kpop.rects[Math.min(activeSlot, kpop.rects.length - 1)] : null
+  const slotAspect = slotRect ? slotRect.w / slotRect.h : 4 / 3
+
+  useEffect(() => {
+    let alive = true
+    if (kpop) poseGuide(kpop, Math.min(activeSlot, kpop.rects.length - 1)).then((u) => alive && setGuide(u))
+    else setGuide(null)
+    return () => {
+      alive = false
+    }
+  }, [kpop, activeSlot])
 
   // Pasang stream yang sudah ada (tanpa meminta izin lagi). Saat keluar dari langkah ini kamera dijeda, bukan dimatikan.
   useEffect(() => {
@@ -72,7 +90,15 @@ export function CameraStep({
   const captureInto = (index: number) => {
     const video = videoRef.current
     if (!video || !video.videoWidth) return
-    const url = frameToDataURL(video, video.videoWidth, video.videoHeight, filters[filterRef.current].fx, mirrorRef.current)
+    const r = kpop ? kpop.rects[Math.min(index, kpop.rects.length - 1)] : null
+    const url = frameToDataURL(
+      video,
+      video.videoWidth,
+      video.videoHeight,
+      filters[filterRef.current].fx,
+      mirrorRef.current,
+      r ? r.w / r.h : 4 / 3,
+    )
     setFlash(true)
     window.setTimeout(() => setFlash(false), 180)
     setShots((cur) => cur.map((s, i) => (i === index ? url : s)))
@@ -146,15 +172,22 @@ export function CameraStep({
           <span>KLIKKO CAM</span>
           <div className="record"><i /> LIVE</div>
         </div>
-        <div className={`viewfinder ${cameraOn ? 'is-live' : ''} ${mirror ? 'mirror' : ''}`} style={{ filter: cameraOn ? filter.css : undefined }}>
-          <video ref={videoRef} autoPlay playsInline muted />
+        <div className={`viewfinder ${cameraOn ? 'is-live' : ''} ${mirror ? 'mirror' : ''}`} style={{ aspectRatio: String(slotAspect) }}>
+          <video ref={videoRef} autoPlay playsInline muted style={{ filter: cameraOn ? filter.css : undefined }} />
+          {kpop && cameraOn && guide && <img className="pose-guide" src={guide} alt="" draggable={false} />}
           {!cameraOn && (
             <div className="camera-empty">
               <div className="camera-icon"><Icon name="camera" size={34} /></div>
               <h3>{cameraError ? 'OOPS, KAMERANYA MALU' : 'KAMERA SIAP BERAKSI'}</h3>
-              <p>{cameraError || 'Izinkan akses kamera, lalu senyum paling lebar.'}</p>
+              <p>
+                {cameraError
+                  ? `${cameraError}${kpop ? ' Frame K-Pop harus difoto langsung lewat kamera di website ini.' : cameraFallback ? ' Atau pakai tombol kamera HP di bawah.' : ''}`
+                  : kpop
+                    ? 'Izinkan akses kamera. Pose idol akan muncul sebagai panduan.'
+                    : 'Izinkan akses kamera, lalu senyum paling lebar.'}
+              </p>
               <button onClick={onStartCamera}>{cameraError ? 'Coba Lagi' : 'Aktifkan Kamera'}</button>
-              {cameraError && (
+              {cameraError && !kpop && cameraFallback && (
                 <button className="alt" onClick={() => captureRef.current?.click()}>
                   Foto pakai kamera HP
                 </button>
@@ -169,9 +202,13 @@ export function CameraStep({
           {cameraOn && <span className="filter-tag">{filter.name}</span>}
         </div>
         <div className="controls">
-          <button className="small-control" onClick={() => fileRef.current?.click()} disabled={running} aria-label="Upload foto">
-            <Icon name="upload" />
-          </button>
+          {kpop ? (
+            <span className="small-control ghost" aria-hidden="true" />
+          ) : (
+            <button className="small-control" onClick={() => fileRef.current?.click()} disabled={running} aria-label="Upload foto">
+              <Icon name="upload" />
+            </button>
+          )}
           <button
             className={`shutter ${running ? 'is-running' : ''}`}
             onClick={running ? stopSequence : startSequence}
@@ -183,8 +220,8 @@ export function CameraStep({
           <button className="small-control" onClick={() => setFilterIndex((filterIndex + 1) % filters.length)} aria-label="Ganti filter">
             <Icon name="flash" />
           </button>
-          <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={uploadPhotos} />
-          <input ref={captureRef} type="file" accept="image/*" capture="user" hidden onChange={uploadPhotos} />
+          {!kpop && <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={uploadPhotos} />}
+          {!kpop && <input ref={captureRef} type="file" accept="image/*" capture="user" hidden onChange={uploadPhotos} />}
         </div>
 
         <div className="cam-options">
@@ -204,6 +241,7 @@ export function CameraStep({
           </button>
         </div>
         <p className="cam-hint">
+          {kpop ? 'Ikuti pose idol di layar. Foto diambil langsung dari kamera. ' : ''}
           {auto ? `Klik sekali, semua slot difoto otomatis tiap ${timer} detik.` : `Klik tombol kamera untuk tiap foto (hitung mundur ${timer} detik).`}
         </p>
 

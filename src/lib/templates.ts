@@ -20,6 +20,8 @@ export type Template = {
   thumbSrc?: string
   /** lubang ke-i menampilkan foto ke-slotOf[i] (untuk lembar 2 strip kembar). Default: identitas */
   slotOf?: number[]
+  /** 'kpop' = frame berisi sosok idol; ditampilkan terpisah dan foto user ada di belakangnya */
+  group?: 'kpop'
   source: 'builtin' | 'file' | 'upload'
 }
 
@@ -318,23 +320,25 @@ type ManifestEntry = {
 }
 
 const BASE = import.meta.env.BASE_URL
-const resolveUrl = (u: string) => (/^(https?:|data:|\/)/.test(u) ? u : `${BASE}templates/${u}`)
+const resolveUrl = (u: string, dir = 'templates/') => (/^(https?:|data:|\/)/.test(u) ? u : `${BASE}${dir}${u}`)
 
-/** Muat daftar template dari public/templates/manifest.json. Gambar baru diunduh saat dibutuhkan. */
-export async function loadManifestTemplates(): Promise<{ templates: Template[]; replaceBuiltin: boolean }> {
+async function loadManifest(
+  dir: string,
+  group?: 'kpop',
+): Promise<{ templates: Template[]; replaceBuiltin: boolean }> {
   try {
-    const res = await fetch(`${BASE}templates/manifest.json`, { cache: 'no-cache' })
+    const res = await fetch(`${BASE}${dir}manifest.json`, { cache: 'no-cache' })
     if (!res.ok) return { templates: [], replaceBuiltin: false }
     const json = (await res.json()) as { replaceBuiltin?: boolean; templates?: ManifestEntry[] }
     const loaded = await Promise.all(
       (json.templates ?? []).map(async (e, i): Promise<Template | null> => {
         try {
-          const url = resolveUrl(e.src)
+          const url = resolveUrl(e.src, dir)
           let t: Template
           if (e.photoSlots?.length && e.width && e.height) {
             // metadata lengkap: tidak perlu mengunduh gambar besar sekarang
             t = {
-              id: e.id ?? `file-${i}`,
+              id: e.id ?? `${group ?? 'file'}-${i}`,
               name: e.name ?? e.src,
               slots: e.slots ?? (e.slotOf ? Math.max(...e.slotOf) + 1 : e.photoSlots.length),
               width: e.width,
@@ -349,8 +353,9 @@ export async function loadManifestTemplates(): Promise<{ templates: Template[]; 
             t = await templateFromImage(url, { id: e.id ?? `file-${i}`, name: e.name ?? e.src.replace(/\.[a-z0-9]+$/i, ''), source: 'file' })
             if (e.slots) t.slots = e.slots
           }
-          if (e.thumb) t.thumbSrc = resolveUrl(e.thumb)
+          if (e.thumb) t.thumbSrc = resolveUrl(e.thumb, dir)
           if (e.slotOf) t.slotOf = e.slotOf
+          if (group) t.group = group
           const holes = t.rects.length
           const expected = t.slotOf ? t.slotOf.length : t.slots
           if (!(SLOT_OPTIONS as readonly number[]).includes(t.slots) || holes !== expected) {
@@ -370,6 +375,16 @@ export async function loadManifestTemplates(): Promise<{ templates: Template[]; 
   }
 }
 
+/** Muat template biasa (public/templates) dan frame K-Pop (public/templates/kpop). */
+export async function loadManifestTemplates(): Promise<{
+  templates: Template[]
+  kpop: Template[]
+  replaceBuiltin: boolean
+}> {
+  const [main, kpop] = await Promise.all([loadManifest('templates/'), loadManifest('templates/kpop/', 'kpop')])
+  return { templates: main.templates, kpop: kpop.templates, replaceBuiltin: main.replaceBuiltin }
+}
+
 /* ------------------------------------------------------------------ */
 /* Compose: gambar template + foto ke canvas                           */
 /* ------------------------------------------------------------------ */
@@ -378,7 +393,7 @@ export function composeTemplate(
   canvas: HTMLCanvasElement,
   t: Template,
   photos: (CanvasImageSource | null)[],
-  opts: { scale?: number; overlay?: HTMLImageElement | null } = {},
+  opts: { scale?: number; overlay?: HTMLImageElement | null; numbers?: boolean } = {},
 ) {
   const overlay = opts.overlay ?? null
   const scale = opts.scale ?? 1
@@ -409,6 +424,10 @@ export function composeTemplate(
     } else {
       ctx.fillStyle = '#d7c5ff'
       ctx.fillRect(r.x, r.y, r.w, r.h)
+      if (opts.numbers === false) {
+        ctx.restore()
+        return
+      }
       ctx.fillStyle = 'rgba(255,255,255,.65)'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'

@@ -1,0 +1,509 @@
+{
+ "templates": [
+  {
+   "id": "kpop-01",
+   "name": "Frame 01",
+   "slots": 3,
+   "src": "kpop-01.webp",
+   "thumb": "kpop-01-thumb.webp",
+   "width": 600,
+   "height": 1800,
+   "photoSlots": [
+    {
+     "x": 58,
+     "y": 290,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 709,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 1128,
+     "w": 486,
+     "h": 382
+    }
+   ]
+  },
+  {
+   "id": "kpop-02",
+   "name": "Frame 02",
+   "slots": 3,
+   "src": "kpop-02.webp",
+   "thumb": "kpop-02-thumb.webp",
+   "width": 600,
+   "height": 1800,
+   "photoSlots": [
+    {
+     "x": 58,
+     "y": 290,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 709,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 1128,
+     "w": 486,
+     "h": 382
+    }
+   ]
+  },
+  {
+   "id": "kpop-03",
+   "name": "Frame 03",
+   "slots": 3,
+   "src": "kpop-03.webp",
+   "thumb": "kpop-03-thumb.webp",
+   "width": 600,
+   "height": 1800,
+   "photoSlots": [
+    {
+     "x": 58,
+     "y": 290,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 709,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 1128,
+     "w": 486,
+     "h": 382
+    }
+   ]
+  },
+  {
+   "id": "kpop-04",
+   "name": "Frame 04",
+   "slots": 3,
+   "src": "kpop-04.webp",
+   "thumb": "kpop-04-thumb.webp",
+   "width": 600,
+   "height": 1800,
+   "photoSlots": [
+    {
+     "x": 58,
+     "y": 290,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 709,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 1128,
+     "w": 486,
+     "h": 382
+    }
+   ]
+  },
+  {
+   "id": "kpop-05",
+   "name": "Frame 05",
+   "slots": 3,
+   "src": "kpop-05.webp",
+   "thumb": "kpop-05-thumb.webp",
+   "width": 600,
+   "height": 1800,
+   "photoSlots": [
+    {
+     "x": 58,
+     "y": 290,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 709,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 1128,
+     "w": 486,
+     "h": 382
+    }
+   ]
+  },
+  {
+   "id": "kpop-06",
+   "name": "Frame 06",
+   "slots": 3,
+   "src": "kpop-06.webp",
+   "thumb": "kpop-06-thumb.webp",
+   "width": 600,
+   "height": 1800,
+   "photoSlots": [
+    {
+     "x": 58,
+     "y": 290,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 709,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 1128,
+     "w": 486,
+     "h": 382
+    }
+   ]
+  },
+  {
+   "id": "kpop-07",
+   "name": "Frame 07",
+   "slots": 3,
+   "src": "kpop-07.webp",
+   "thumb": "kpop-07-thumb.webp",
+   "width": 600,
+   "height": 1800,
+   "photoSlots": [
+    {
+     "x": 58,
+     "y": 290,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 709,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 1128,
+     "w": 486,
+     "h": 382
+    }
+   ]
+  },
+  {
+   "id": "kpop-08",
+   "name": "Frame 08",
+   "slots": 3,
+   "src": "kpop-08.webp",
+   "thumb": "kpop-08-thumb.webp",
+   "width": 600,
+   "height": 1800,
+   "photoSlots": [
+    {
+     "x": 58,
+     "y": 290,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 709,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 1128,
+     "w": 486,
+     "h": 382
+    }
+   ]
+  },
+  {
+   "id": "kpop-09",
+   "name": "Frame 09",
+   "slots": 3,
+   "src": "kpop-09.webp",
+   "thumb": "kpop-09-thumb.webp",
+   "width": 600,
+   "height": 1800,
+   "photoSlots": [
+    {
+     "x": 58,
+     "y": 290,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 709,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 1128,
+     "w": 486,
+     "h": 382
+    }
+   ]
+  },
+  {
+   "id": "kpop-10",
+   "name": "Frame 10",
+   "slots": 3,
+   "src": "kpop-10.webp",
+   "thumb": "kpop-10-thumb.webp",
+   "width": 600,
+   "height": 1800,
+   "photoSlots": [
+    {
+     "x": 58,
+     "y": 290,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 709,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 1128,
+     "w": 486,
+     "h": 382
+    }
+   ]
+  },
+  {
+   "id": "kpop-11",
+   "name": "Frame 11",
+   "slots": 3,
+   "src": "kpop-11.webp",
+   "thumb": "kpop-11-thumb.webp",
+   "width": 600,
+   "height": 1800,
+   "photoSlots": [
+    {
+     "x": 58,
+     "y": 290,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 709,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 1128,
+     "w": 486,
+     "h": 382
+    }
+   ]
+  },
+  {
+   "id": "kpop-12",
+   "name": "Frame 12",
+   "slots": 3,
+   "src": "kpop-12.webp",
+   "thumb": "kpop-12-thumb.webp",
+   "width": 600,
+   "height": 1800,
+   "photoSlots": [
+    {
+     "x": 58,
+     "y": 290,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 709,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 1128,
+     "w": 486,
+     "h": 382
+    }
+   ]
+  },
+  {
+   "id": "kpop-13",
+   "name": "Frame 13",
+   "slots": 3,
+   "src": "kpop-13.webp",
+   "thumb": "kpop-13-thumb.webp",
+   "width": 600,
+   "height": 1800,
+   "photoSlots": [
+    {
+     "x": 58,
+     "y": 290,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 709,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 1128,
+     "w": 486,
+     "h": 382
+    }
+   ]
+  },
+  {
+   "id": "kpop-14",
+   "name": "Frame 14",
+   "slots": 3,
+   "src": "kpop-14.webp",
+   "thumb": "kpop-14-thumb.webp",
+   "width": 600,
+   "height": 1800,
+   "photoSlots": [
+    {
+     "x": 58,
+     "y": 290,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 709,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 1128,
+     "w": 486,
+     "h": 382
+    }
+   ]
+  },
+  {
+   "id": "kpop-15",
+   "name": "Frame 15",
+   "slots": 3,
+   "src": "kpop-15.webp",
+   "thumb": "kpop-15-thumb.webp",
+   "width": 600,
+   "height": 1800,
+   "photoSlots": [
+    {
+     "x": 58,
+     "y": 290,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 709,
+     "w": 486,
+     "h": 382
+    },
+    {
+     "x": 58,
+     "y": 1128,
+     "w": 486,
+     "h": 382
+    }
+   ]
+  },
+  {
+   "id": "kpop-16",
+   "name": "Frame 16",
+   "slots": 4,
+   "src": "kpop-16.webp",
+   "thumb": "kpop-16-thumb.webp",
+   "width": 600,
+   "height": 1800,
+   "photoSlots": [
+    {
+     "x": 57,
+     "y": 52,
+     "w": 486,
+     "h": 384
+    },
+    {
+     "x": 57,
+     "y": 482,
+     "w": 486,
+     "h": 384
+    },
+    {
+     "x": 57,
+     "y": 910,
+     "w": 486,
+     "h": 384
+    },
+    {
+     "x": 57,
+     "y": 1340,
+     "w": 486,
+     "h": 385
+    }
+   ]
+  },
+  {
+   "id": "kpop-17",
+   "name": "Frame 17",
+   "slots": 4,
+   "src": "kpop-17.webp",
+   "thumb": "kpop-17-thumb.webp",
+   "width": 600,
+   "height": 1800,
+   "photoSlots": [
+    {
+     "x": 57,
+     "y": 52,
+     "w": 486,
+     "h": 384
+    },
+    {
+     "x": 57,
+     "y": 482,
+     "w": 486,
+     "h": 384
+    },
+    {
+     "x": 57,
+     "y": 910,
+     "w": 486,
+     "h": 384
+    },
+    {
+     "x": 57,
+     "y": 1340,
+     "w": 486,
+     "h": 385
+    }
+   ]
+  }
+ ]
+}

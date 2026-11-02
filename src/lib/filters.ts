@@ -92,15 +92,15 @@ function applyFxPixels(ctx: CanvasRenderingContext2D, w: number, h: number, fx: 
   ctx.putImageData(img, 0, 0)
 }
 
-/** Ambil crop tengah 4:3 dari video/gambar, terapkan filter, kembalikan sebagai JPEG data-URL. */
+/** Ambil crop tengah (default 4:3, atau sesuai `aspect`) dari video/gambar, terapkan filter, kembalikan sebagai JPEG data-URL. */
 export function frameToDataURL(
   src: HTMLVideoElement | HTMLImageElement,
   srcW: number,
   srcH: number,
   fx: Fx,
   mirror: boolean,
+  aspect = 4 / 3,
 ): string {
-  const aspect = 4 / 3
   let cw = srcW
   let ch = srcW / aspect
   if (ch > srcH) {
