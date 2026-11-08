@@ -2,9 +2,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CameraStep } from './components/CameraStep'
 import { EditStep } from './components/EditStep'
 import { Icon } from './components/Icon'
-import { KpopPicker } from './components/KpopPicker'
+import { FramePicker } from './components/FramePicker'
 import { SizeStep } from './components/SizeStep'
 import { builtinTemplates, loadManifestTemplates, type Template } from './lib/templates'
+import type { Clip } from './lib/gif'
 import type { Sticker } from './lib/stickers'
 
 const demoPhotos = [
@@ -25,6 +26,7 @@ function App() {
   const [step, setStep] = useState<Step>('size')
   const [n, setN] = useState<number | null>(null)
   const [shots, setShots] = useState<(string | null)[]>([])
+  const [clips, setClips] = useState<(Clip | null)[]>([])
   const [filterIndex, setFilterIndex] = useState(0)
   // Kamera dipegang di level App supaya izin cukup sekali dan stream tetap hidup antar langkah.
   const [stream, setStream] = useState<MediaStream | null>(null)
@@ -39,11 +41,11 @@ function App() {
   const builtins = useMemo(() => builtinTemplates(), [])
   const [fileTemplates, setFileTemplates] = useState<Template[]>([])
   const [kpopTemplates, setKpopTemplates] = useState<Template[]>([])
-  // mode K-Pop: frame idol terpilih (jumlah foto & template ikut frame ini)
-  const [kpop, setKpop] = useState<Template | null>(null)
-  const [view, setView] = useState<'sizes' | 'kpop'>('sizes')
+  // frame terpilih (dikunci setelah langkah 1); frame K-Pop punya panduan pose
+  const [frame, setFrame] = useState<Template | null>(null)
+  const [view, setView] = useState<'sizes' | 'frames' | 'kpop'>('sizes')
   const [replaceBuiltin, setReplaceBuiltin] = useState(false)
-  const [chosen, setChosen] = useState<Record<number, string>>({})
+  const isKpop = frame?.group === 'kpop'
 
   const startCamera = useCallback(async () => {
     setCameraError('')
@@ -139,41 +141,33 @@ function App() {
     [fileTemplates, builtins, replaceBuiltin],
   )
 
-  const list = n ? templatesFor(n) : []
-  const template = kpop ?? (n ? (list.find((t) => t.id === chosen[n]) ?? list[0]) : undefined)
 
   const goBooth = () => {
     document.getElementById('booth')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
+  // ukuran dipilih -> tampilkan frame untuk ukuran itu (belum masuk kamera)
   const pickSize = (count: number) => {
-    if (kpop) {
-      // pindah dari mode K-Pop: foto lama dibuat untuk pose idol, jadi mulai dari awal
-      setKpop(null)
-      setShots(Array(count).fill(null))
-      setStickers([])
-      setN(count)
-    } else if (count !== n) {
-      setShots((cur) => Array.from({ length: count }, (_, i) => cur[i] ?? null))
-      setStickers([])
-      setN(count)
-    }
-    setStep('shoot')
+    setN(count)
+    setView('frames')
   }
 
-  const pickKpop = (t: Template) => {
-    if (kpop?.id !== t.id) {
+  const pickFrame = (t: Template) => {
+    if (frame?.id !== t.id) {
       setShots(Array(t.slots).fill(null))
+      setClips(Array(t.slots).fill(null))
       setStickers([])
     }
-    setKpop(t)
+    setFrame(t)
     setN(t.slots)
+    setView('sizes')
     setStep('shoot')
   }
 
   const resetAll = () => {
     if (!n) return
     setShots(Array(n).fill(null))
+    setClips(Array(n).fill(null))
     setStickers([])
   }
 
@@ -182,12 +176,12 @@ function App() {
       setView('sizes')
       setStep('size')
     }
-    else if (target === 'shoot' && n) setStep('shoot')
-    else if (target === 'edit' && n && shots.length === n && shots.every(Boolean)) setStep('edit')
+    else if (canGo(target)) setStep(target)
   }
 
+  const ready = !!frame && frame.slots === n
   const canGo = (target: Step) =>
-    target === 'size' || (target === 'shoot' && !!n) || (target === 'edit' && !!n && shots.length === n && shots.every(Boolean))
+    target === 'size' || (target === 'shoot' && ready) || (target === 'edit' && ready && shots.length === n && shots.every(Boolean))
 
   return (
     <main>
@@ -237,7 +231,7 @@ function App() {
         <div className="section-heading">
           <span>01 / YOUR MINI STUDIO</span>
           <h2>OKAY, WAKTUNYA<br /><em>JADI MAIN CHARACTER.</em></h2>
-          <p>Pilih ukuran, siapin pose terbaikmu, lalu klik. Hias hasilnya dengan stiker dan template favoritmu.</p>
+          <p>Pilih ukuran dan frame, siapin pose terbaikmu, lalu klik. Hias hasilnya dengan stiker dan teks favoritmu.</p>
         </div>
 
         <ol className="stepper" aria-label="Langkah photobooth">
@@ -250,7 +244,7 @@ function App() {
                 aria-current={step === s.id ? 'step' : undefined}
               >
                 <b>{s.num}</b> {s.label}
-                {s.id === 'size' && n ? <em>{kpop ? 'K-Pop' : `${n} foto`}</em> : null}
+                {s.id === 'size' && ready ? <em>{isKpop ? 'K-Pop' : `${n} foto`}</em> : null}
               </button>
             </li>
           ))}
@@ -259,30 +253,50 @@ function App() {
         {step === 'size' && view === 'sizes' && (
           <SizeStep
             templatesFor={templatesFor}
-            current={kpop ? null : n}
+            current={frame && !isKpop ? n : null}
             onPick={pickSize}
             kpopTemplates={kpopTemplates}
-            kpopActive={!!kpop}
+            kpopActive={isKpop}
             onKpop={() => setView('kpop')}
           />
         )}
 
-        {step === 'size' && view === 'kpop' && (
-          <KpopPicker templates={kpopTemplates} currentId={kpop?.id ?? null} onPick={pickKpop} onBack={() => setView('sizes')} />
+        {step === 'size' && view === 'frames' && n && (
+          <FramePicker
+            title={`PILIH FRAME • ${n} FOTO`}
+            templates={templatesFor(n)}
+            currentId={frame?.id ?? null}
+            onPick={pickFrame}
+            onBack={() => setView('sizes')}
+            numbers={false}
+          />
         )}
 
-        {step === 'shoot' && n && template && (
+        {step === 'size' && view === 'kpop' && (
+          <FramePicker
+            title="MAU FOTO BARENG SIAPA?"
+            templates={kpopTemplates}
+            currentId={frame?.id ?? null}
+            onPick={pickFrame}
+            onBack={() => setView('sizes')}
+            numbers={false}
+            showCount
+          />
+        )}
+
+        {step === 'shoot' && n && frame && (
           <CameraStep
             n={n}
             shots={shots}
             setShots={setShots}
+            setClips={setClips}
             filterIndex={filterIndex}
             setFilterIndex={setFilterIndex}
-            previewTemplate={template}
+            frame={frame}
             stream={stream}
             cameraError={cameraError}
             cameraFallback={cameraFallback}
-            kpop={kpop}
+            isKpop={isKpop}
             onStartCamera={startCamera}
             mirror={mirror}
             setMirror={setMirror}
@@ -295,14 +309,12 @@ function App() {
           />
         )}
 
-        {step === 'edit' && n && template && (
+        {step === 'edit' && n && frame && (
           <EditStep
             n={n}
             shots={shots}
-            templates={kpop ? [kpop] : list}
-            lockedTemplate={!!kpop}
-            template={template}
-            onTemplate={(id) => setChosen((c) => ({ ...c, [n]: id }))}
+            clips={clips}
+            template={frame}
             stickers={stickers}
             setStickers={setStickers}
             onBack={() => setStep('shoot')}
@@ -332,7 +344,7 @@ function App() {
             <span className="step-num">03</span>
             <div className="step-icon yellow"><Icon name="download" size={28} /></div>
             <h3>HIAS & SIMPAN</h3>
-            <p>Tempel stiker, ganti template, lalu download photostrip kamu.</p>
+            <p>Tempel stiker dan teks, lalu download photostrip kamu.</p>
           </article>
         </div>
       </section>

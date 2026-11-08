@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&family=Permanent+Marker&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&family=Permanent+Marker&family=Pacifico&family=Lobster&family=Bangers&family=Caveat:wght@700&family=Dancing+Script:wght@700&family=Fredoka:wght@600&display=swap');
 @import 'tailwindcss';
 
 :root {
@@ -414,3 +414,25 @@ footer p { justify-self: end; text-align: right; font-size: 10px; font-weight: 7
   .kpop-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
 }
 .kpop-banner .size-go { display: inline-flex; }
+
+/* aksi download: PNG + GIF */
+.edit-actions { flex-wrap: wrap; }
+.edit-actions > button:first-child { flex: 1 1 100%; }
+.edit-actions .download { flex: 1 1 0; }
+.edit-actions .download.gif { background: var(--yellow); color: var(--ink); }
+
+/* stiker: grid emoji bisa di-scroll, composer teks */
+.emoji-grid { max-height: 232px; overflow-y: auto; overscroll-behavior: contain; }
+.text-composer { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.text-composer input[type=text] { width: 100%; border: var(--line); border-radius: 10px; padding: 10px 12px; font: 600 15px 'DM Sans'; background: var(--white); }
+.tc-label { font-size: 10px; font-weight: 900; letter-spacing: .08em; color: #4b454d; }
+.font-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.font-list button { border: 1.5px solid var(--ink); border-radius: 10px; background: var(--white); padding: 6px 10px; font-size: 15px; line-height: 1.1; cursor: pointer; }
+.font-list button.active { background: var(--yellow); box-shadow: 2px 2px 0 var(--ink); }
+.theme-list { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.theme-list button { width: 34px; height: 34px; border: 2px solid var(--ink); border-radius: 10px; font: 900 15px 'Archivo Black'; cursor: pointer; display: grid; place-items: center; }
+.theme-list button.active { outline: 3px solid var(--blue); outline-offset: 2px; }
+.tc-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.tc-row .mini-btn.on { background: var(--yellow); }
+.tc-preview { border: 1.5px dashed var(--ink); border-radius: 12px; min-height: 64px; display: grid; place-items: center; padding: 10px; background: var(--cream); overflow: hidden; }
+.text-presets-title { padding: 0 12px; margin: 0; }

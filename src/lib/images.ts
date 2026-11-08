@@ -40,12 +40,12 @@ export async function downscaleDataURL(dataUrl: string, maxSide: number): Promis
   return { url: canvas.toDataURL('image/png'), aspect: w / h }
 }
 
-export async function ensureFonts() {
+export async function ensureFonts(extra: string[] = []) {
   try {
     await Promise.all([
       document.fonts.load('40px "Archivo Black"'),
-      document.fonts.load('40px "Permanent Marker"'),
       document.fonts.load('700 24px "DM Sans"'),
+      ...extra.map((css) => document.fonts.load(css)),
     ])
   } catch {
     /* font gagal dimuat: canvas memakai fallback */

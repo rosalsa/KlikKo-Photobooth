@@ -92,15 +92,16 @@ function applyFxPixels(ctx: CanvasRenderingContext2D, w: number, h: number, fx: 
   ctx.putImageData(img, 0, 0)
 }
 
-/** Ambil crop tengah (default 4:3, atau sesuai `aspect`) dari video/gambar, terapkan filter, kembalikan sebagai JPEG data-URL. */
-export function frameToDataURL(
+/** Crop tengah (aspect bebas) dari video/gambar + filter, hasilnya canvas. `maxW` membatasi lebar output. */
+export function frameToCanvas(
   src: HTMLVideoElement | HTMLImageElement,
   srcW: number,
   srcH: number,
   fx: Fx,
   mirror: boolean,
   aspect = 4 / 3,
-): string {
+  maxW = 1280,
+): HTMLCanvasElement {
   let cw = srcW
   let ch = srcW / aspect
   if (ch > srcH) {
@@ -109,12 +110,12 @@ export function frameToDataURL(
   }
   const sx = (srcW - cw) / 2
   const sy = (srcH - ch) / 2
-  const outW = Math.min(1280, Math.round(cw))
+  const outW = Math.min(maxW, Math.round(cw))
   const outH = Math.round(outW / aspect)
   const canvas = document.createElement('canvas')
   canvas.width = outW
   canvas.height = outH
-  const ctx = canvas.getContext('2d')!
+  const ctx = canvas.getContext('2d', { willReadFrequently: !supportsCtxFilter() })!
   const native = supportsCtxFilter()
   const hasFx = Object.keys(fx).length > 0
   if (native && hasFx) ctx.filter = cssOf(fx)
@@ -126,5 +127,17 @@ export function frameToDataURL(
   ctx.setTransform(1, 0, 0, 1, 0, 0)
   ctx.filter = 'none'
   if (!native && hasFx) applyFxPixels(ctx, outW, outH, fx)
-  return canvas.toDataURL('image/jpeg', 0.92)
+  return canvas
+}
+
+/** Sama seperti frameToCanvas, tetapi mengembalikan JPEG data-URL (untuk foto utama). */
+export function frameToDataURL(
+  src: HTMLVideoElement | HTMLImageElement,
+  srcW: number,
+  srcH: number,
+  fx: Fx,
+  mirror: boolean,
+  aspect = 4 / 3,
+): string {
+  return frameToCanvas(src, srcW, srcH, fx, mirror, aspect).toDataURL('image/jpeg', 0.92)
 }

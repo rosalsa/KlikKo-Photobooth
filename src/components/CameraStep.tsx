@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { filters, frameToDataURL } from '../lib/filters'
+import { filters, frameToCanvas, frameToDataURL } from '../lib/filters'
+import type { Clip } from '../lib/gif'
 import { poseGuide } from '../lib/guide'
 import { loadImage, readFileAsDataURL } from '../lib/images'
 import type { Template } from '../lib/templates'
@@ -7,20 +8,25 @@ import { Icon } from './Icon'
 import { StripCanvas } from './StripCanvas'
 
 const TIMERS = [3, 5, 10]
+const CLIP_BEFORE = 10 // frame sebelum jepret
+const CLIP_AFTER = 8 // frame sesudah jepret
+const CLIP_STEP = 100 // ms antar frame
+const CLIP_WIDTH = 360
 const sleep = (ms: number) => new Promise<void>((r) => window.setTimeout(r, ms))
 
 type Props = {
   n: number
   shots: (string | null)[]
   setShots: React.Dispatch<React.SetStateAction<(string | null)[]>>
+  setClips: React.Dispatch<React.SetStateAction<(Clip | null)[]>>
   filterIndex: number
   setFilterIndex: (i: number) => void
-  previewTemplate: Template
+  frame: Template
   stream: MediaStream | null
   cameraError: string
   cameraFallback: boolean
-  /** frame K-Pop terpilih: kamera mengikuti bentuk slot, ada panduan pose, dan upload dimatikan */
-  kpop: Template | null
+  /** frame K-Pop: ada panduan pose dan upload dimatikan */
+  isKpop: boolean
   onStartCamera: () => void
   mirror: boolean
   setMirror: (v: boolean) => void
@@ -33,7 +39,7 @@ type Props = {
 }
 
 export function CameraStep({
-  n, shots, setShots, filterIndex, setFilterIndex, previewTemplate, stream, cameraError, cameraFallback, kpop, onStartCamera,
+  n, shots, setShots, setClips, filterIndex, setFilterIndex, frame, stream, cameraError, cameraFallback, isKpop, onStartCamera,
   mirror, setMirror, timer, setTimer, auto, setAuto, onNext, onReset,
 }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -42,6 +48,8 @@ export function CameraStep({
   const seqRef = useRef(0) // token urutan foto; berubah = urutan lama dibatalkan
   const filterRef = useRef(filterIndex)
   const mirrorRef = useRef(mirror)
+  const ringRef = useRef<HTMLCanvasElement[]>([])
+  const ringTimer = useRef<number | null>(null)
   const [countdown, setCountdown] = useState<number | null>(null)
   const [running, setRunning] = useState(false)
   const [current, setCurrent] = useState(0)
@@ -57,17 +65,17 @@ export function CameraStep({
   const targetIndex = retake ?? shots.findIndex((s) => !s)
   // slot yang sedang difoto (menentukan panduan pose & bentuk crop pada mode K-Pop)
   const activeSlot = running ? current - 1 : targetIndex >= 0 ? targetIndex : 0
-  const slotRect = kpop ? kpop.rects[Math.min(activeSlot, kpop.rects.length - 1)] : null
+  const slotRect = frame.rects[Math.min(activeSlot, frame.rects.length - 1)]
   const slotAspect = slotRect ? slotRect.w / slotRect.h : 4 / 3
 
   useEffect(() => {
     let alive = true
-    if (kpop) poseGuide(kpop, Math.min(activeSlot, kpop.rects.length - 1)).then((u) => alive && setGuide(u))
+    if (isKpop) poseGuide(frame, Math.min(activeSlot, frame.rects.length - 1)).then((u) => alive && setGuide(u))
     else setGuide(null)
     return () => {
       alive = false
     }
-  }, [kpop, activeSlot])
+  }, [isKpop, frame, activeSlot])
 
   // Pasang stream yang sudah ada (tanpa meminta izin lagi). Saat keluar dari langkah ini kamera dijeda, bukan dimatikan.
   useEffect(() => {
@@ -87,10 +95,40 @@ export function CameraStep({
     [],
   )
 
+  const aspectOf = (index: number) => {
+    const r = frame.rects[Math.min(index, frame.rects.length - 1)]
+    return r ? r.w / r.h : 4 / 3
+  }
+
+  // frame kecil dengan filter + mirror + crop yang sama seperti foto, untuk klip GIF
+  const grabClipFrame = (index: number) => {
+    const video = videoRef.current
+    if (!video || !video.videoWidth) return null
+    return frameToCanvas(video, video.videoWidth, video.videoHeight, filters[filterRef.current].fx, mirrorRef.current, aspectOf(index), CLIP_WIDTH)
+  }
+
+  const startRing = (index: number) => {
+    stopRing()
+    ringRef.current = []
+    ringTimer.current = window.setInterval(() => {
+      const f = grabClipFrame(index)
+      if (!f) return
+      ringRef.current.push(f)
+      if (ringRef.current.length > CLIP_BEFORE) ringRef.current.shift()
+    }, CLIP_STEP)
+  }
+
+  const stopRing = () => {
+    if (ringTimer.current !== null) window.clearInterval(ringTimer.current)
+    ringTimer.current = null
+  }
+
+  useEffect(() => stopRing, [])
+
   const captureInto = (index: number) => {
     const video = videoRef.current
     if (!video || !video.videoWidth) return
-    const r = kpop ? kpop.rects[Math.min(index, kpop.rects.length - 1)] : null
+    const r = frame.rects[Math.min(index, frame.rects.length - 1)]
     const url = frameToDataURL(
       video,
       video.videoWidth,
@@ -102,11 +140,13 @@ export function CameraStep({
     setFlash(true)
     window.setTimeout(() => setFlash(false), 180)
     setShots((cur) => cur.map((s, i) => (i === index ? url : s)))
+    setClips((cur) => cur.map((c, i) => (i === index ? null : c)))
     setRetake(null)
   }
 
   const stopSequence = () => {
     seqRef.current += 1
+    stopRing()
     setCountdown(null)
     setRunning(false)
   }
@@ -117,16 +157,32 @@ export function CameraStep({
     const id = (seqRef.current += 1)
     setRunning(true)
     for (let q = 0; q < queue.length; q += 1) {
-      setCurrent(queue[q] + 1)
+      const index = queue[q]
+      setCurrent(index + 1)
+      startRing(index)
       for (let s = timer; s > 0; s -= 1) {
         setCountdown(s)
         await sleep(1000)
         if (seqRef.current !== id) return
       }
       setCountdown(null)
-      captureInto(queue[q])
+      stopRing()
+      const before = ringRef.current.slice()
+      captureInto(index)
+      // rekam beberapa frame setelah jepret supaya GIF terasa seperti live photo
+      const after: HTMLCanvasElement[] = []
+      for (let k = 0; k < CLIP_AFTER; k += 1) {
+        await sleep(CLIP_STEP)
+        if (seqRef.current !== id) return
+        const f = grabClipFrame(index)
+        if (f) after.push(f)
+      }
+      if (before.length + after.length > 1) {
+        const clip: Clip = { frames: [...before, ...after], still: before.length }
+        setClips((cur) => cur.map((c, i) => (i === index ? clip : c)))
+      }
       if (q < queue.length - 1) {
-        await sleep(900) // jeda singkat untuk ganti pose
+        await sleep(300) // jeda singkat untuk ganti pose
         if (seqRef.current !== id) return
       }
     }
@@ -137,23 +193,30 @@ export function CameraStep({
     const files = Array.from(event.target.files ?? [])
     event.target.value = ''
     if (!files.length) return
-    const urls: string[] = []
+    // tentukan slot tujuan tiap file dulu supaya crop sesuai bentuk slot frame
+    const targets: number[] = []
+    if (retake !== null) targets.push(retake)
+    shots.forEach((s, i) => {
+      if (!s && i !== retake) targets.push(i)
+    })
+    const placed: { index: number; url: string }[] = []
     for (const file of files) {
+      const index = targets[placed.length]
+      if (index === undefined) break
       try {
         const raw = await readFileAsDataURL(file)
         const img = await loadImage(raw)
-        urls.push(frameToDataURL(img, img.naturalWidth, img.naturalHeight, filters[filterRef.current].fx, false))
+        const r = frame.rects[Math.min(index, frame.rects.length - 1)]
+        placed.push({
+          index,
+          url: frameToDataURL(img, img.naturalWidth, img.naturalHeight, filters[filterRef.current].fx, false, r ? r.w / r.h : 4 / 3),
+        })
       } catch {
         /* lewati file yang bukan gambar */
       }
     }
-    setShots((cur) => {
-      const next = [...cur]
-      const queue = [...urls]
-      if (retake !== null && queue.length) next[retake] = queue.shift()!
-      for (let i = 0; i < next.length && queue.length; i += 1) if (!next[i]) next[i] = queue.shift()!
-      return next
-    })
+    setShots((cur) => cur.map((s, i) => placed.find((p) => p.index === i)?.url ?? s))
+    setClips((cur) => cur.map((c, i) => (placed.some((p) => p.index === i) ? null : c)))
     setRetake(null)
   }
 
@@ -174,20 +237,20 @@ export function CameraStep({
         </div>
         <div className={`viewfinder ${cameraOn ? 'is-live' : ''} ${mirror ? 'mirror' : ''}`} style={{ aspectRatio: String(slotAspect) }}>
           <video ref={videoRef} autoPlay playsInline muted style={{ filter: cameraOn ? filter.css : undefined }} />
-          {kpop && cameraOn && guide && <img className="pose-guide" src={guide} alt="" draggable={false} />}
+          {isKpop && cameraOn && guide && <img className="pose-guide" src={guide} alt="" draggable={false} />}
           {!cameraOn && (
             <div className="camera-empty">
               <div className="camera-icon"><Icon name="camera" size={34} /></div>
               <h3>{cameraError ? 'OOPS, KAMERANYA MALU' : 'KAMERA SIAP BERAKSI'}</h3>
               <p>
                 {cameraError
-                  ? `${cameraError}${kpop ? ' Frame K-Pop harus difoto langsung lewat kamera di website ini.' : cameraFallback ? ' Atau pakai tombol kamera HP di bawah.' : ''}`
-                  : kpop
+                  ? `${cameraError}${isKpop ? ' Frame K-Pop harus difoto langsung lewat kamera di website ini.' : cameraFallback ? ' Atau pakai tombol kamera HP di bawah.' : ''}`
+                  : isKpop
                     ? 'Izinkan akses kamera. Pose idol akan muncul sebagai panduan.'
                     : 'Izinkan akses kamera, lalu senyum paling lebar.'}
               </p>
               <button onClick={onStartCamera}>{cameraError ? 'Coba Lagi' : 'Aktifkan Kamera'}</button>
-              {cameraError && !kpop && cameraFallback && (
+              {cameraError && !isKpop && cameraFallback && (
                 <button className="alt" onClick={() => captureRef.current?.click()}>
                   Foto pakai kamera HP
                 </button>
@@ -202,7 +265,7 @@ export function CameraStep({
           {cameraOn && <span className="filter-tag">{filter.name}</span>}
         </div>
         <div className="controls">
-          {kpop ? (
+          {isKpop ? (
             <span className="small-control ghost" aria-hidden="true" />
           ) : (
             <button className="small-control" onClick={() => fileRef.current?.click()} disabled={running} aria-label="Upload foto">
@@ -220,8 +283,8 @@ export function CameraStep({
           <button className="small-control" onClick={() => setFilterIndex((filterIndex + 1) % filters.length)} aria-label="Ganti filter">
             <Icon name="flash" />
           </button>
-          {!kpop && <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={uploadPhotos} />}
-          {!kpop && <input ref={captureRef} type="file" accept="image/*" capture="user" hidden onChange={uploadPhotos} />}
+          {!isKpop && <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={uploadPhotos} />}
+          {!isKpop && <input ref={captureRef} type="file" accept="image/*" capture="user" hidden onChange={uploadPhotos} />}
         </div>
 
         <div className="cam-options">
@@ -241,7 +304,7 @@ export function CameraStep({
           </button>
         </div>
         <p className="cam-hint">
-          {kpop ? 'Ikuti pose idol di layar. Foto diambil langsung dari kamera. ' : ''}
+          {isKpop ? 'Ikuti pose idol di layar. Foto diambil langsung dari kamera. ' : ''}
           {auto ? `Klik sekali, semua slot difoto otomatis tiap ${timer} detik.` : `Klik tombol kamera untuk tiap foto (hitung mundur ${timer} detik).`}
         </p>
 
@@ -278,7 +341,7 @@ export function CameraStep({
         <div className="strip-preview">
           <div className="strip-label">YOUR PHOTO STRIP</div>
           <div className="strip">
-            <StripCanvas template={previewTemplate} photos={shots} maxWidth={420} label="Preview photo strip" />
+            <StripCanvas template={frame} photos={shots} maxWidth={420} label="Preview photo strip" />
           </div>
           <div className="strip-actions">
             <button onClick={onReset} disabled={!filled || running}><Icon name="refresh" size={17} /> Ulangi</button>
